@@ -13,7 +13,7 @@ ui := termui.Create(tc Color, bg Color)
 ## Pages
 
 ```go
-page := termui.Page(tc Color, bg Color, m ContainerMode)
+page := termui.NewPage(tc Color, bg Color, m ContainerMode)
 
 // change to page in ui
 ui.SetPage(page)
@@ -25,7 +25,7 @@ ui.SetPage(page)
 ## Containers
 
 ```go
-container := termui.Container(tc Color, bg Color, m ContainerMode)
+container := termui.NewContainer(tc Color, bg Color, m ContainerMode)
 ```
 
 - Containers are what every element in your ui is made of

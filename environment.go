@@ -30,6 +30,7 @@ func (e *Environment) GetSize() (int, int) {
 	return e.width, e.height
 }
 
+// Update refreshes all information about the environment
 func (e *Environment) Update() {
 	// update rows and cols
 	fd := int(os.Stdout.Fd())
@@ -40,7 +41,6 @@ func (e *Environment) Update() {
 		return
 	}
 	e.SetSize(width, height)
-	// fmt.Printf("%v %v", width, height)
 }
 
 // StartWatcher starts the environment watcher ticker
@@ -66,6 +66,7 @@ func (e *Environment) StopWatcher() {
 	stopEnvTicker <- true
 }
 
+// NewEnvrionment returns a pointer to a new Envrionment
 func NewEnvironment() *Environment {
 	return &Environment{}
 }
