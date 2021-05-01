@@ -1,8 +1,12 @@
 package termui
 
+import (
+	"runtime"
+)
+
 // Window top level application container
 type Window struct {
-	*Container
+	Container
 }
 
 // Tick executes every tick
@@ -16,4 +20,13 @@ func (w *Window) Tick() {
 	if height != w.height {
 		w.height = height
 	}
+}
+
+// Start starts draw, tick and environment loops
+func (w *Window) Start() {
+	ClearTerminal()
+
+	ENV.StartWatcher()
+	SCREEN.StartDrawLoop()
+	runtime.Goexit()
 }

@@ -18,6 +18,6 @@ func (c *Color) ToANSII(fg bool) string {
 	return fmt.Sprintf("\033[%s;%v;%v;%vm", s, c.r, c.g, c.b)
 }
 
-func NewColor(r, g, b int) *Color {
-	return &Color{r, g, b}
+func NewColor(r, g, b int) Color {
+	return Color{r, g, b}
 }
