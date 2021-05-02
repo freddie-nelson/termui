@@ -2,6 +2,7 @@ package termui
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"time"
 )
@@ -18,6 +19,7 @@ type Screen struct {
 	scrollY         int
 	scrollX         int
 	visibleElements []*Container
+	out             *os.File
 }
 
 // SwapBuffers swaps the pointers of the front and back buffer
@@ -57,11 +59,12 @@ func (s *Screen) FindVisibleElements(parent *Container) {
 		}
 	}
 
+	// fmt.Printf("\r %v %v", ENV.width, ENV.height)
 }
 
 // SortByYPos sorts elements by y coord ascending order
 func (s *Screen) SortByYPos(elements []*Container) {
-	sort.Slice(elements, func(i, j int) bool {
+	sort.SliceStable(elements, func(i, j int) bool {
 		return elements[i].y < elements[j].y
 	})
 }
@@ -87,20 +90,15 @@ func (s *Screen) BufferVisibleElements() {
 	}
 }
 
-// SetCursorPos returns the ANSII string to set cursor position to col, row
-func SetCursorPos(col, row int) string {
-	return fmt.Sprintf("\033[%v;%vH", row, col)
-}
-
 // DrawFrame swaps buffers and draws front buffer to terminal
 func (s *Screen) DrawFrame() {
 	s.SwapBuffers()
 
-	output := SetCursorPos(0, 0)
-	for x := 0; x < len(s.frontBuffer); x++ {
+	output := ""
+	for y := 0; y < ENV.height; y++ {
 		last := NewColor(-1, -1, -1)
 
-		for y := 0; y < len(s.frontBuffer[x]); y++ {
+		for x := 0; x < ENV.width; x++ {
 			c := s.frontBuffer[x][y]
 			if c.r != last.r || c.g != last.g || c.b != last.b {
 				output += fmt.Sprintf("%s ", c.ToANSII(false))
@@ -110,7 +108,9 @@ func (s *Screen) DrawFrame() {
 		}
 	}
 
-	fmt.Print(output)
+	SetCursorPos(0, 0)
+	HideCursor()
+	s.out.WriteString(output)
 }
 
 // StartWatcher starts the environment watcher ticker
@@ -145,5 +145,5 @@ func (s *Screen) StopDrawLoop() {
 
 // NewScreen returns a pointer to a new screen
 func NewScreen() *Screen {
-	return &Screen{}
+	return &Screen{out: os.Stdout}
 }

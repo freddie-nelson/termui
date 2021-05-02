@@ -23,13 +23,15 @@ func (c *Container) Position() (int, int) {
 	return c.x, c.y
 }
 
-func (c *Container) AddChild(child *Container) {
-	if c == child {
-		// TODO add logger
-		return
-	}
+func (c *Container) AddChild(children ...*Container) {
+	for _, child := range children {
+		if c == child {
+			// TODO add logger
+			return
+		}
 
-	c.children = append(c.children, child)
+		c.children = append(c.children, child)
+	}
 }
 
 // NewContainer returns a pointer to a new base container
