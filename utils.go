@@ -2,9 +2,8 @@ package termui
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
-	"runtime"
+
+	"golang.org/x/term"
 )
 
 // SetCursorPos sest cursor position to col, row
@@ -22,25 +21,23 @@ func ShowCursor() {
 	SCREEN.out.WriteString("\033[?25h")
 }
 
+// ResetAttributes resets all attributes in the terminal
+func ResetAttributes() {
+	SCREEN.out.WriteString("\033[0m")
+}
+
 // ClearTerminal uses platform specific commands to clear terminal
 // TODO look for better implementation of this
 func ClearTerminal() {
-	clear := make(map[string]func()) //Initialize it
-	clear["linux"] = func() {
-		cmd := exec.Command("clear") //Linux example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	}
-	clear["windows"] = func() {
-		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
+	SCREEN.out.WriteString("\033[2J")
+}
+
+// SetTermRawMode puts the terminal into raw mode, returns old state of terminal
+func SetTermRawMode() *term.State {
+	oldState, err := term.MakeRaw(int(SCREEN.out.Fd()))
+	if err != nil {
+		panic(err)
 	}
 
-	value, ok := clear[runtime.GOOS] //runtime.GOOS -> linux, windows, darwin etc.
-	if ok {                          //if we defined a clear func for that platform:
-		value() //we execute it
-	} else { //unsupported platform
-		panic("Your platform is unsupported! I can't clear terminal screen :(")
-	}
+	return oldState
 }
