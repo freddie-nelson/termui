@@ -6,6 +6,7 @@ type Container struct {
 	y        int
 	width    int
 	height   int
+	zIndex   int
 	color    Color
 	bgColor  Color
 	children []*Container
@@ -23,6 +24,11 @@ func (c *Container) Position() (int, int) {
 	return c.x, c.y
 }
 
+// SetZIndex sets the z index of the container
+func (c *Container) SetZIndex(zIndex int) {
+	c.zIndex = zIndex
+}
+
 func (c *Container) AddChild(children ...*Container) {
 	for _, child := range children {
 		if c == child {
@@ -36,5 +42,5 @@ func (c *Container) AddChild(children ...*Container) {
 
 // NewContainer returns a pointer to a new base container
 func NewContainer(x, y, width, height int, color, bgColor Color) *Container {
-	return &Container{x, y, width, height, color, bgColor, make([]*Container, 0)}
+	return &Container{x, y, width, height, 0, color, bgColor, make([]*Container, 0)}
 }

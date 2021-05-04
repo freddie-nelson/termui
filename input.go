@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// Input handles all user input and associated events e.g. focused element
 type Input struct {
 	in *os.File
 }
@@ -13,7 +14,7 @@ func (input *Input) StartKeyboardListener() {
 	go func() {
 		for {
 			// only read single characters, the rest will be ignored!!
-			consoleReader := bufio.NewReaderSize(os.Stdin, 1)
+			consoleReader := bufio.NewReaderSize(input.in, 1)
 			input, _ := consoleReader.ReadByte()
 
 			// ESC = 27 and Ctrl-C = 3

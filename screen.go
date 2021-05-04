@@ -14,12 +14,11 @@ var (
 
 // Screen handles rendering of ui
 type Screen struct {
-	frontBuffer     [][]Color
-	backBuffer      [][]Color
-	scrollY         int
-	scrollX         int
-	visibleElements []*Container
-	out             *os.File
+	frontBuffer [][]Color
+	backBuffer  [][]Color
+	scrollY     int
+	scrollX     int
+	out         *os.File
 }
 
 // SwapBuffers swaps the pointers of the front and back buffer
@@ -45,47 +44,55 @@ func (s *Screen) ClearBuffer(front bool) {
 	}
 }
 
-// FindVisibleElements finds all elements that are currently on the screen
-func (s *Screen) FindVisibleElements(parent *Container) {
-	visibleVertical := (parent.y >= s.scrollY || parent.y+parent.height >= s.scrollY) && parent.y < s.scrollY+ENV.height
-	visibleHorizontal := (parent.x >= s.scrollX || parent.x+parent.width >= s.scrollX) && parent.x < s.scrollX+ENV.width
-	if visibleVertical && visibleHorizontal {
-		s.visibleElements = append(s.visibleElements, parent)
-	}
-
-	if len(parent.children) > 0 {
-		for _, c := range parent.children {
-			s.FindVisibleElements(c)
-		}
-	}
-
-	// fmt.Printf("\r %v %v", ENV.width, ENV.height)
+// IsElementOnScreen returns true if the given container is currently on screen
+func (s *Screen) IsElementOnScreen(c *Container) bool {
+	visibleVertical := (c.y >= s.scrollY || c.y+c.height >= s.scrollY) && c.y < s.scrollY+ENV.height
+	visibleHorizontal := (c.x >= s.scrollX || c.x+c.width >= s.scrollX) && c.x < s.scrollX+ENV.width
+	return visibleVertical && visibleHorizontal
 }
 
-// SortByYPos sorts elements by y coord ascending order
-func (s *Screen) SortByYPos(elements []*Container) {
-	sort.SliceStable(elements, func(i, j int) bool {
-		return elements[i].y < elements[j].y
+// SortElements sorts elements by zIndex ascending, y ascending, x ascending
+func (s *Screen) SortElements(es []*Container) {
+	sort.SliceStable(es, func(i, j int) bool {
+		if es[i].zIndex < es[j].zIndex {
+			return true
+		} else if es[i].zIndex > es[j].zIndex {
+			return false
+		}
+
+		if es[i].y < es[j].y {
+			return true
+		} else if es[i].y > es[j].y {
+			return false
+		}
+
+		return es[i].x < es[j].x
 	})
 }
 
-// BufferVisibleElements renders all visible elements into the back buffer
-func (s *Screen) BufferVisibleElements() {
-	s.visibleElements = make([]*Container, 0)
-	for _, c := range WINDOW.children {
-		s.FindVisibleElements(c)
+// BufferContainer renders the container to the back buffer
+func (s *Screen) BufferContainer(c *Container) {
+	for i := 0; i < c.width; i++ {
+		for j := 0; j < c.height; j++ {
+			if s.backBuffer[c.x+i] != nil && len(s.backBuffer[c.x+i]) > c.y+j {
+				s.backBuffer[c.x+i][c.y+j] = c.bgColor
+			}
+		}
+	}
+}
+
+// BufferChildren renders all visible children of parent onto the back buffer
+func (s *Screen) BufferChildren(children []*Container) {
+	if len(children) == 0 {
+		return
 	}
 
-	s.SortByYPos(s.visibleElements)
+	s.SortElements(children)
 
-	for _, element := range s.visibleElements {
-
-		for i := 0; i < element.width; i++ {
-			for j := 0; j < element.height; j++ {
-				if s.backBuffer[element.x+i] != nil && len(s.backBuffer[element.x+i]) > element.y+j {
-					s.backBuffer[element.x+i][element.y+j] = element.bgColor
-				}
-			}
+	for _, c := range children {
+		if s.IsElementOnScreen(c) {
+			s.BufferContainer(c)
+			s.BufferChildren(c.children)
 		}
 	}
 }
@@ -101,6 +108,8 @@ func (s *Screen) DrawFrame() {
 		for x := 0; x < ENV.width; x++ {
 			c := s.frontBuffer[x][y]
 			if c.r != last.r || c.g != last.g || c.b != last.b {
+				last = c
+
 				output += fmt.Sprintf("%s ", c.ToANSII(false))
 			} else {
 				output += " "
@@ -130,7 +139,7 @@ func (s *Screen) StartDrawLoop() {
 				return
 			case <-drawTicker.C:
 				s.ClearBuffer(false)
-				s.BufferVisibleElements()
+				s.BufferChildren(WINDOW.children)
 				s.DrawFrame()
 			}
 		}

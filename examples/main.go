@@ -17,6 +17,9 @@ func main() {
 	c2 := termui.NewContainer(3, 3, 10, 5, blue, blue)
 	c3 := termui.NewContainer(6, 6, 10, 5, red, red)
 	c4 := termui.NewContainer(12, 0, 10, 5, red, red)
+	c4.SetZIndex(2)
+	c2.SetZIndex(1)
+
 	ui.AddChild(c, c2, c3, c4)
 
 	ui.Start()
