@@ -139,7 +139,7 @@ func (s *Screen) StartDrawLoop() {
 				return
 			case <-drawTicker.C:
 				s.ClearBuffer(false)
-				s.BufferChildren(WINDOW.children)
+				s.BufferChildren(WINDOW.page.children)
 				s.DrawFrame()
 			}
 		}

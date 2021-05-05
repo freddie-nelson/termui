@@ -28,12 +28,11 @@ var INPUT *Input
 var PreviousState *term.State
 
 // Create creates a new termui instance
-// color and bgColor are colors of main window
 // returns a pointer to the termui window
-func Create(color Color, bgColor Color) *Window {
+func Create() *Window {
 	ENV = NewEnvironment()
 	SCREEN = NewScreen()
-	WINDOW = &Window{Container: *NewContainer(0, 0, 0, 0, color, bgColor)}
+	WINDOW = &Window{}
 	INPUT = NewInput(os.Stdin)
 
 	PreviousState = SetTermRawMode()

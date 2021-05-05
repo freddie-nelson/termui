@@ -6,7 +6,14 @@ import (
 
 // Window top level application container
 type Window struct {
-	Container
+	width  int
+	height int
+	page   *Page
+}
+
+// SetPage sets the current page
+func (w *Window) SetPage(p *Page) {
+	w.page = p
 }
 
 // Tick executes every tick
