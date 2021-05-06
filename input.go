@@ -10,16 +10,46 @@ type Input struct {
 	in *os.File
 }
 
-func (input *Input) StartKeyboardListener() {
-	go func() {
-		for {
-			// only read single characters, the rest will be ignored!!
-			consoleReader := bufio.NewReaderSize(input.in, 1)
-			input, _ := consoleReader.ReadByte()
+// IsMouseEvent returns true if a mouse event has been sent to stdin
+func (input *Input) IsMouseEvent(r *bufio.Reader, key rune) bool {
+	val := false
 
-			// ESC = 27 and Ctrl-C = 3
-			if input == 27 || input == 3 {
-				Close()
+	if r.Buffered() != 0 {
+		if char, _, _ := r.ReadRune(); key == 27 && char == 91 {
+			val = true
+		}
+
+		r.UnreadRune()
+	}
+
+	return val
+}
+
+// handleMouse handles mouse events
+func (input *Input) handleMouse() {
+}
+
+// handleKeyboard handles keyboard events
+func (input *Input) handleKeyboard(key rune) {
+
+}
+
+func (input *Input) StartInputListener() {
+	go func() {
+		reader := bufio.NewReader(input.in)
+
+		for {
+			key, _, _ := reader.ReadRune()
+
+			if input.IsMouseEvent(reader, key) {
+				input.handleMouse()
+			} else {
+				// if ESC (27) or Ctrl-c (3) are pressed, exit
+				if key == 27 || key == 3 {
+					Close()
+				}
+
+				input.handleKeyboard(key)
 			}
 		}
 	}()
@@ -28,7 +58,7 @@ func (input *Input) StartKeyboardListener() {
 // NewInput returns a pointer to a new Input
 func NewInput(in *os.File) *Input {
 	input := Input{in: in}
-	input.StartKeyboardListener()
+	input.StartInputListener()
 
 	return &input
 }

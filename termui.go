@@ -45,6 +45,7 @@ func Close() {
 	term.Restore(int(SCREEN.out.Fd()), PreviousState)
 	ResetAttributes()
 	ClearTerminal()
+	UntrackMouse()
 	ShowCursor()
 	SetCursorPos(0, 0)
 	os.Exit(0)

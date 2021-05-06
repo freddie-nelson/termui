@@ -32,8 +32,9 @@ func (w *Window) Tick() {
 // Start starts draw, tick and environment loops
 func (w *Window) Start() {
 	ClearTerminal()
+	TrackMouse()
 
 	ENV.StartWatcher()
-	SCREEN.StartDrawLoop()
+	// SCREEN.StartDrawLoop()
 	runtime.Goexit()
 }

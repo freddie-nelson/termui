@@ -21,6 +21,16 @@ func ShowCursor() {
 	SCREEN.out.WriteString("\033[?25h")
 }
 
+// TrackMouse enables xterm VT200 mouse tracking if the current terminal supports it
+func TrackMouse() {
+	SCREEN.out.WriteString("\033[?1000h")
+}
+
+// UntrackMouse disables xterm VT200 mouse tracking if the current terminal supports it
+func UntrackMouse() {
+	SCREEN.out.WriteString("\033[?1000l")
+}
+
 // ResetAttributes resets all attributes in the terminal
 func ResetAttributes() {
 	SCREEN.out.WriteString("\033[0m")
