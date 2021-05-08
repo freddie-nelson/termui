@@ -2,6 +2,7 @@ package termui
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
@@ -11,6 +12,8 @@ const (
 	MOUSE_WHEEL
 	RIGHT_CLICK
 	RELEASE_MOUSE
+	SCROLL_UP
+	SCROLL_DOWN
 )
 
 // Input handles all user input and associated events e.g. focused element
@@ -42,6 +45,15 @@ func (input *Input) readMouseEvent(r *bufio.Reader) (byte, byte, byte, byte) {
 
 	// button pressed or release
 	button := Cb & byte(3)
+	// if cb 64 bit is set then event is scroll
+	if Cb&byte(64) == 64 {
+		if button == LEFT_CLICK {
+			button = SCROLL_UP
+		} else {
+			button = SCROLL_DOWN
+		}
+	}
+
 	modifier := Cb & byte(28)
 
 	// position
@@ -58,6 +70,7 @@ func (input *Input) readMouseEvent(r *bufio.Reader) (byte, byte, byte, byte) {
 // handleMouse handles mouse events
 func (input *Input) handleMouse(r *bufio.Reader) {
 	button, modifier, mouseX, mouseY := input.readMouseEvent(r)
+	fmt.Printf(" %v %v %v %v", button, modifier, mouseX, mouseY)
 }
 
 // handleKeyboard handles keyboard events
