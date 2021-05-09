@@ -17,16 +17,18 @@ func main() {
 	// home page
 	homePage := termui.NewPage(bg, bg)
 
-	c := termui.NewContainer(0, 0, 10, 12, green, green)
-	c2 := termui.NewContainer(3, 3, 10, 5, blue, blue)
+	c := termui.NewContainer(0, 0, 10, 12, 0, green)
+	c2 := termui.NewContainer(3, 3, 10, 5, 0, blue)
 	c2.SetZIndex(1)
-	c3 := termui.NewContainer(6, 6, 10, 5, red, red)
-	c4 := termui.NewContainer(12, 0, 10, 5, red, red)
+	c3 := termui.NewContainer(6, 6, 10, 5, 0, red)
+	c4 := termui.NewContainer(12, 0, 10, 5, 0, red)
 	c4.SetZIndex(2)
-	c5 := termui.NewContainer(17, 3, 10, 5, blue, blue)
+	c5 := termui.NewContainer(17, 3, 10, 5, 0, blue)
 	c4.AddChild(c5)
 
-	homePage.AddChild(c, c2, c3, c4)
+	title := termui.NewText(30, 12, 30, 3, 1, bg, blue, "Hello world!")
+
+	homePage.AddChild(c, c2, c3, c4, title)
 	ui.SetPage(homePage)
 
 	ui.Start()
