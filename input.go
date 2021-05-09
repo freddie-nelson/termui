@@ -87,7 +87,7 @@ func (input *Input) StartInputListener() {
 				input.handleMouse(reader)
 			} else {
 				// if ESC (27) or Ctrl-c (3) are pressed, exit
-				if key == 27 || key == 3 {
+				if (key == 27 && reader.Buffered() == 0) || key == 3 {
 					Close()
 				}
 
