@@ -93,11 +93,11 @@ func (s *Screen) BufferElement(e Element) {
 	width, height := e.Size()
 	x, y, _ := e.Position()
 
-	for i := 0; i < width; i++ {
-		for j := 0; j < height; j++ {
-			if s.backBuffer[x+i] != nil && len(s.backBuffer[x+i]) > y+j {
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			if s.backBuffer[x+j] != nil && len(s.backBuffer[x+j]) > y+i {
 				color, bgColor := e.Colors()
-				s.backBuffer[x+i][y+j] = Cell{e.CharAt(i, j), color, bgColor}
+				s.backBuffer[x+j][y+i] = Cell{e.CharAt(j, i), color, bgColor}
 			}
 		}
 	}

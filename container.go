@@ -52,7 +52,7 @@ func (c *Container) Colors() (Color, Color) {
 	return NewColor(-1, -1, -1), c.bgColor
 }
 
-// CharAt returns the character at the position in the container
+// CharAt returns the character at the relative x and y of the container
 func (c *Container) CharAt(x, y int) rune {
 	return ' '
 }
