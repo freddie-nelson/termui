@@ -57,7 +57,7 @@ func (c *Container) CharAt(x, y int) rune {
 	return ' '
 }
 
-// Children returns a slice of this elements children
+// Children returns a slice of this element's children
 func (c *Container) Children() []Element {
 	return c.children
 }

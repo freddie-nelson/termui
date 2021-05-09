@@ -16,7 +16,6 @@ type Cell struct {
 	char    rune
 	color   Color
 	bgColor Color
-	filled  bool
 }
 
 // Screen handles rendering of ui
@@ -39,9 +38,15 @@ func (s *Screen) SwapBuffers() {
 func (s *Screen) ClearBuffer(front bool) {
 	width, height := ENV.GetSize()
 
+	color, bgColor := WINDOW.page.Colors()
+
 	buffer := make([][]Cell, width)
 	for x := range buffer {
 		buffer[x] = make([]Cell, height)
+
+		for y := range buffer[x] {
+			buffer[x][y] = Cell{' ', color, bgColor}
+		}
 	}
 
 	if front {
@@ -92,7 +97,7 @@ func (s *Screen) BufferElement(e Element) {
 		for j := 0; j < height; j++ {
 			if s.backBuffer[x+i] != nil && len(s.backBuffer[x+i]) > y+j {
 				color, bgColor := e.Colors()
-				s.backBuffer[x+i][y+j] = Cell{e.CharAt(i, j), color, bgColor, true}
+				s.backBuffer[x+i][y+j] = Cell{e.CharAt(i, j), color, bgColor}
 			}
 		}
 	}
@@ -125,10 +130,6 @@ func (s *Screen) DrawFrame() {
 
 		for x := 0; x < ENV.width; x++ {
 			c := s.frontBuffer[x][y]
-			char := string(c.char)
-			if !c.filled {
-				char = " "
-			}
 
 			// color cell
 			if c.bgColor != lastBg {
@@ -140,7 +141,7 @@ func (s *Screen) DrawFrame() {
 				output += lastC.ToANSII(true)
 			}
 
-			output += char
+			output += string(c.char)
 		}
 	}
 
