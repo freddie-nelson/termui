@@ -1,8 +1,14 @@
 package termui
 
 type Element interface {
-	Tick()
+	Id() string
 	Size() (int, int)
-	Position() (int, int)
-	AddChild(child *Container)
+	SetSize(width, height int)
+	Position() (int, int, int)
+	SetPosition(x, y int)
+	SetZIndex(zIndex int)
+	Colors() (Color, Color)
+	CharAt(x, y int) rune
+	Children() []Element
+	AddChild(child ...Element)
 }

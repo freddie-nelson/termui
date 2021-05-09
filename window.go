@@ -35,6 +35,6 @@ func (w *Window) Start() {
 	TrackMouse()
 
 	ENV.StartWatcher()
-	// SCREEN.StartDrawLoop()
+	SCREEN.StartDrawLoop()
 	runtime.Goexit()
 }

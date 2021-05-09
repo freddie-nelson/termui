@@ -31,7 +31,7 @@ func (p *Page) ResizeToWindow(resize bool) {
 }
 
 // SetFocusedElement sets the currently focused element
-func (p *Page) SetFocusedElement(c *Container) {
+func (p *Page) SetFocusedElement(e Element) {
 	if p.isElementFocused {
 		// TODO clear currently focused element
 	} else {
@@ -40,7 +40,7 @@ func (p *Page) SetFocusedElement(c *Container) {
 
 	// find element
 	for i, child := range p.children {
-		if child == c {
+		if child == e {
 			p.focusedElement = i
 		}
 	}
@@ -48,5 +48,5 @@ func (p *Page) SetFocusedElement(c *Container) {
 
 // NewPage returns a pointer to a new page
 func NewPage(color, bgColor Color) *Page {
-	return &Page{Container: *NewContainer(0, 0, WINDOW.width, WINDOW.height, color, bgColor), resizeToWindow: true}
+	return &Page{Container: *NewContainer(0, 0, WINDOW.width, WINDOW.height, 0, bgColor), resizeToWindow: true}
 }

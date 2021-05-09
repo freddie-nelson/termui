@@ -2,7 +2,6 @@ package termui
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 )
 
@@ -69,8 +68,8 @@ func (input *Input) readMouseEvent(r *bufio.Reader) (byte, byte, byte, byte) {
 
 // handleMouse handles mouse events
 func (input *Input) handleMouse(r *bufio.Reader) {
-	button, modifier, mouseX, mouseY := input.readMouseEvent(r)
-	fmt.Printf(" %v %v %v %v", button, modifier, mouseX, mouseY)
+	// button, modifier, mouseX, mouseY := input.readMouseEvent(r)
+	// fmt.Printf(" %v %v %v %v", button, modifier, mouseX, mouseY)
 }
 
 // handleKeyboard handles keyboard events

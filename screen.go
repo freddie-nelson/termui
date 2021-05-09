@@ -1,7 +1,6 @@
 package termui
 
 import (
-	"fmt"
 	"os"
 	"sort"
 	"time"
@@ -12,10 +11,18 @@ var (
 	stopDrawTicker chan bool
 )
 
+// holds color and character of individual cell in buffer
+type Cell struct {
+	char    rune
+	color   Color
+	bgColor Color
+	filled  bool
+}
+
 // Screen handles rendering of ui
 type Screen struct {
-	frontBuffer [][]Color
-	backBuffer  [][]Color
+	frontBuffer [][]Cell
+	backBuffer  [][]Cell
 	scrollY     int
 	scrollX     int
 	out         *os.File
@@ -32,9 +39,9 @@ func (s *Screen) SwapBuffers() {
 func (s *Screen) ClearBuffer(front bool) {
 	width, height := ENV.GetSize()
 
-	buffer := make([][]Color, width)
-	for x, _ := range buffer {
-		buffer[x] = make([]Color, height)
+	buffer := make([][]Cell, width)
+	for x := range buffer {
+		buffer[x] = make([]Cell, height)
 	}
 
 	if front {
@@ -45,44 +52,54 @@ func (s *Screen) ClearBuffer(front bool) {
 }
 
 // IsElementOnScreen returns true if the given container is currently on screen
-func (s *Screen) IsElementOnScreen(c *Container) bool {
-	visibleVertical := (c.y >= s.scrollY || c.y+c.height >= s.scrollY) && c.y < s.scrollY+ENV.height
-	visibleHorizontal := (c.x >= s.scrollX || c.x+c.width >= s.scrollX) && c.x < s.scrollX+ENV.width
+func (s *Screen) IsElementOnScreen(c Element) bool {
+	x, y, _ := c.Position()
+	width, height := c.Size()
+
+	visibleVertical := (y >= s.scrollY || y+height >= s.scrollY) && y < s.scrollY+ENV.height
+	visibleHorizontal := (x >= s.scrollX || x+width >= s.scrollX) && x < s.scrollX+ENV.width
 	return visibleVertical && visibleHorizontal
 }
 
 // SortElements sorts elements by zIndex ascending, y ascending, x ascending
-func (s *Screen) SortElements(es []*Container) {
+func (s *Screen) SortElements(es []Element) {
 	sort.SliceStable(es, func(i, j int) bool {
-		if es[i].zIndex < es[j].zIndex {
+		x1, y1, z1 := es[i].Position()
+		x2, y2, z2 := es[j].Position()
+
+		if z1 < z2 {
 			return true
-		} else if es[i].zIndex > es[j].zIndex {
+		} else if z1 > z2 {
 			return false
 		}
 
-		if es[i].y < es[j].y {
+		if y1 < y2 {
 			return true
-		} else if es[i].y > es[j].y {
+		} else if y1 > y2 {
 			return false
 		}
 
-		return es[i].x < es[j].x
+		return x1 < x2
 	})
 }
 
-// BufferContainer renders the container to the back buffer
-func (s *Screen) BufferContainer(c *Container) {
-	for i := 0; i < c.width; i++ {
-		for j := 0; j < c.height; j++ {
-			if s.backBuffer[c.x+i] != nil && len(s.backBuffer[c.x+i]) > c.y+j {
-				s.backBuffer[c.x+i][c.y+j] = c.bgColor
+// BufferElement renders the element to the back buffer
+func (s *Screen) BufferElement(e Element) {
+	width, height := e.Size()
+	x, y, _ := e.Position()
+
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
+			if s.backBuffer[x+i] != nil && len(s.backBuffer[x+i]) > y+j {
+				color, bgColor := e.Colors()
+				s.backBuffer[x+i][y+j] = Cell{e.CharAt(i, j), color, bgColor, true}
 			}
 		}
 	}
 }
 
 // BufferChildren renders all visible children of parent onto the back buffer
-func (s *Screen) BufferChildren(children []*Container) {
+func (s *Screen) BufferChildren(children []Element) {
 	if len(children) == 0 {
 		return
 	}
@@ -91,8 +108,8 @@ func (s *Screen) BufferChildren(children []*Container) {
 
 	for _, c := range children {
 		if s.IsElementOnScreen(c) {
-			s.BufferContainer(c)
-			s.BufferChildren(c.children)
+			s.BufferElement(c)
+			s.BufferChildren(c.Children())
 		}
 	}
 }
@@ -103,17 +120,27 @@ func (s *Screen) DrawFrame() {
 
 	output := ""
 	for y := 0; y < ENV.height; y++ {
-		last := NewColor(-1, -1, -1)
+		lastC := NewColor(-1, -1, -1)
+		lastBg := NewColor(-1, -1, -1)
 
 		for x := 0; x < ENV.width; x++ {
 			c := s.frontBuffer[x][y]
-			if c.r != last.r || c.g != last.g || c.b != last.b {
-				last = c
-
-				output += fmt.Sprintf("%s ", c.ToANSII(false))
-			} else {
-				output += " "
+			char := string(c.char)
+			if !c.filled {
+				char = " "
 			}
+
+			// color cell
+			if c.bgColor != lastBg {
+				lastBg = c.bgColor
+				output += lastBg.ToANSII(false)
+			}
+			if c.color != lastC {
+				lastC = c.color
+				output += lastC.ToANSII(true)
+			}
+
+			output += char
 		}
 	}
 
