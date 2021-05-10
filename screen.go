@@ -16,6 +16,7 @@ type Cell struct {
 	char    rune
 	color   Color
 	bgColor Color
+	element *Element
 }
 
 // Screen handles rendering of ui
@@ -45,7 +46,7 @@ func (s *Screen) ClearBuffer(front bool) {
 		buffer[x] = make([]Cell, height)
 
 		for y := range buffer[x] {
-			buffer[x][y] = Cell{' ', color, bgColor}
+			buffer[x][y] = Cell{' ', color, bgColor, nil}
 		}
 	}
 
@@ -97,7 +98,7 @@ func (s *Screen) BufferElement(e Element) {
 		for j := 0; j < width; j++ {
 			if s.backBuffer[x+j] != nil && len(s.backBuffer[x+j]) > y+i {
 				color, bgColor := e.Colors()
-				s.backBuffer[x+j][y+i] = Cell{e.CharAt(j, i), color, bgColor}
+				s.backBuffer[x+j][y+i] = Cell{e.CharAt(j, i), color, bgColor, &e}
 			}
 		}
 	}

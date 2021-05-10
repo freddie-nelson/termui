@@ -15,7 +15,7 @@ func main() {
 	ui := termui.Create()
 
 	// home page
-	homePage := termui.NewPage(bg, bg)
+	homePage := termui.NewPage(blue, bg)
 
 	c := termui.NewContainer(0, 0, 10, 12, 0, green)
 	c2 := termui.NewContainer(3, 3, 10, 5, 0, blue)
