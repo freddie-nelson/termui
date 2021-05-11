@@ -77,7 +77,13 @@ func (input *Input) handleMouse(r *bufio.Reader) {
 	fmt.Printf(" %v %v", button, modifier)
 
 	target := input.findTargetElement(mouseX, mouseY)
-	fmt.Print(target)
+	if target == nil {
+		WINDOW.page.isElementFocused = false
+	} else if e := *target; e.IsFocusable() {
+		WINDOW.page.isElementFocused = true
+	}
+
+	WINDOW.page.focusedElement = target
 }
 
 // handleKeyboard handles keyboard events

@@ -5,7 +5,7 @@ type Page struct {
 	Container
 	resizeToWindow   bool
 	isElementFocused bool
-	focusedElement   int
+	focusedElement   *Element
 }
 
 // Tick executes every tick

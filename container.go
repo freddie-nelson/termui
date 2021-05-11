@@ -52,6 +52,14 @@ func (c *Container) Colors() (Color, Color) {
 	return NewColor(-1, -1, -1), c.bgColor
 }
 
+func (c *Container) IsFocusable() bool {
+	return c.focusable
+}
+
+func (c *Container) SetFocusable(focusable bool) {
+	c.focusable = focusable
+}
+
 // CharAt returns the character at the relative x and y of the container
 func (c *Container) CharAt(x, y int) rune {
 	return ' '
