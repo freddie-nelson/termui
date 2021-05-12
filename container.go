@@ -26,9 +26,10 @@ func (c *Container) Size() (int, int) {
 }
 
 // SetPosition sets the x and y position of the container
-func (c *Container) SetSize(width, height int) {
+func (c *Container) SetSize(width, height int) *Container {
 	c.width = width
 	c.height = height
+	return c
 }
 
 // Position returns x and y position and zIndex of the container
@@ -37,14 +38,16 @@ func (c *Container) Position() (int, int, int) {
 }
 
 // SetPosition sets the x and y position of the container
-func (c *Container) SetPosition(x, y int) {
+func (c *Container) SetPosition(x, y int) *Container {
 	c.x = x
 	c.y = y
+	return c
 }
 
 // SetZIndex sets the z index of the container
-func (c *Container) SetZIndex(zIndex int) {
+func (c *Container) SetZIndex(zIndex int) *Container {
 	c.zIndex = zIndex
+	return c
 }
 
 // Colors returns the color and bgColor of the container
@@ -52,12 +55,15 @@ func (c *Container) Colors() (Color, Color) {
 	return NewColor(-1, -1, -1), c.bgColor
 }
 
+// IsFocusable returns wether the element can be focused or not
 func (c *Container) IsFocusable() bool {
 	return c.focusable
 }
 
-func (c *Container) SetFocusable(focusable bool) {
+// SetFocusable sets if the element is focusable or not
+func (c *Container) SetFocusable(focusable bool) *Container {
 	c.focusable = focusable
+	return c
 }
 
 // CharAt returns the character at the relative x and y of the container
@@ -70,15 +76,16 @@ func (c *Container) Children() []Element {
 	return c.children
 }
 
-func (c *Container) AddChild(children ...Element) {
+func (c *Container) AddChild(children ...Element) *Container {
 	for _, child := range children {
 		if c.Id() == child.Id() {
-			// TODO add logger
-			return
+			continue
 		}
 
 		c.children = append(c.children, child)
 	}
+
+	return c
 }
 
 // NewContainer returns a pointer to a new base container

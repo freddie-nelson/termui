@@ -2,7 +2,6 @@ package termui
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 )
 
@@ -68,22 +67,19 @@ func (input *Input) readMouseEvent(r *bufio.Reader) (byte, byte, byte, byte) {
 }
 
 func (input *Input) findTargetElement(x, y byte) *Element {
+	if int(x) >= ENV.width || int(y) >= ENV.height {
+		return nil
+	}
+
 	return SCREEN.frontBuffer[x][y].element
 }
 
 // handleMouse handles mouse events
 func (input *Input) handleMouse(r *bufio.Reader) {
-	button, modifier, mouseX, mouseY := input.readMouseEvent(r)
-	fmt.Printf(" %v %v", button, modifier)
+	_, _, mouseX, mouseY := input.readMouseEvent(r)
 
 	target := input.findTargetElement(mouseX, mouseY)
-	if target == nil {
-		WINDOW.page.isElementFocused = false
-	} else if e := *target; e.IsFocusable() {
-		WINDOW.page.isElementFocused = true
-	}
-
-	WINDOW.page.focusedElement = target
+	WINDOW.page.SetFocusedElement(target)
 }
 
 // handleKeyboard handles keyboard events

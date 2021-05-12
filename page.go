@@ -31,18 +31,13 @@ func (p *Page) ResizeToWindow(resize bool) {
 }
 
 // SetFocusedElement sets the currently focused element
-func (p *Page) SetFocusedElement(e Element) {
-	if p.isElementFocused {
-		// TODO clear currently focused element
+func (p *Page) SetFocusedElement(e *Element) {
+	if e == nil || !(*e).IsFocusable() {
+		p.isElementFocused = false
+		p.focusedElement = nil
 	} else {
 		p.isElementFocused = true
-	}
-
-	// find element
-	for i, child := range p.children {
-		if child == e {
-			p.focusedElement = i
-		}
+		p.focusedElement = e
 	}
 }
 

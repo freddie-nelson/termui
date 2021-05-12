@@ -32,5 +32,5 @@ func (t *Text) CharAt(x, y int) rune {
 
 // NewText returns a pointer to a new text container
 func NewText(x, y, width, height, padding int, color, bgColor Color, text string) *Text {
-	return &Text{*NewContainer(x, y, width, height, padding, bgColor), text, color, 0}
+	return &Text{*NewContainer(x, y, width, height, padding, bgColor).SetFocusable(true), text, color, 0}
 }

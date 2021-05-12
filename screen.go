@@ -149,6 +149,7 @@ func (s *Screen) DrawFrame() {
 	SetCursorPos(0, 0)
 	HideCursor()
 	s.out.WriteString(output)
+	ResetAttributes()
 }
 
 // StartWatcher starts the environment watcher ticker

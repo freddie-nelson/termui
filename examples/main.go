@@ -26,10 +26,10 @@ func main() {
 	c5 := termui.NewContainer(17, 3, 10, 5, 0, blue)
 	c4.AddChild(c5)
 
-	title := termui.NewText(11, 5, 30, 3, 1, bg, green, "Hello world!")
+	title := termui.NewText(11, 5, 30, 3, 1, red, green, "Hello world!")
 	title.SetZIndex(1)
 
-	verticalText := termui.NewText(30, 3, 5, 18, 2, bg, red, "Hello world!")
+	verticalText := termui.NewText(30, 3, 5, 18, 2, green, red, "Hello world!")
 	verticalText.SetZIndex(2)
 
 	homePage.AddChild(c, c2, c3, c4, title, verticalText)
