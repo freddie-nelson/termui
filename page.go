@@ -31,8 +31,8 @@ func (p *Page) ResizeToWindow(resize bool) {
 }
 
 // SetFocusedElement sets the currently focused element
-func (p *Page) SetFocusedElement(e *Element) {
-	if e == nil || !(*e).IsFocusable() {
+func (p *Page) SetFocusedElement(e *Element) { // TODO rethink/rework focusing elements (needs research)
+	if e == nil {
 		p.isElementFocused = false
 		p.focusedElement = nil
 	} else {

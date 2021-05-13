@@ -4,16 +4,16 @@ import "github.com/google/uuid"
 
 // Container base container
 type Container struct {
-	x         int
-	y         int
-	width     int
-	height    int
-	padding   int
-	zIndex    int
-	bgColor   Color
-	children  []Element
-	focusable bool
-	id        string
+	x              int
+	y              int
+	width          int
+	height         int
+	padding        int
+	zIndex         int
+	bgColor        Color
+	children       []Element
+	id             string
+	eventListeners map[string]func(e Event)
 }
 
 func (c *Container) Id() string {
@@ -55,17 +55,6 @@ func (c *Container) Colors() (Color, Color) {
 	return NewColor(-1, -1, -1), c.bgColor
 }
 
-// IsFocusable returns wether the element can be focused or not
-func (c *Container) IsFocusable() bool {
-	return c.focusable
-}
-
-// SetFocusable sets if the element is focusable or not
-func (c *Container) SetFocusable(focusable bool) *Container {
-	c.focusable = focusable
-	return c
-}
-
 // CharAt returns the character at the relative x and y of the container
 func (c *Container) CharAt(x, y int) rune {
 	return ' '
@@ -88,7 +77,31 @@ func (c *Container) AddChild(children ...Element) *Container {
 	return c
 }
 
+// AddEventListener adds an event listener to the element which
+// will execute callback every time the element recieves the given event
+// returns a boolean representing if the event was registered successfully or not
+//
+// valid events: mousedown, mouseup, click, rightclick, mousewheeldown, mousewheeldown, scroll, keydown, keyup, keypress
+func (c *Container) AddEventListener(event string, callback func(e Event)) bool {
+	validEvents := []string{"mousedown", "mouseup", "click", "rightclick", "mousewheeldown", "mousewheeldown", "scroll", "keydown", "keyup", "keypress"}
+	valid := false
+
+	for _, ve := range validEvents {
+		if ve == event {
+			valid = true
+			break
+		}
+	}
+
+	if !valid || c.eventListeners[event] != nil {
+		return false
+	}
+
+	c.eventListeners[event] = callback
+	return true
+}
+
 // NewContainer returns a pointer to a new base container
 func NewContainer(x, y, width, height, padding int, bgColor Color) *Container {
-	return &Container{x, y, width, height, padding, 0, bgColor, make([]Element, 0), false, uuid.New().String()}
+	return &Container{x, y, width, height, padding, 0, bgColor, make([]Element, 0), uuid.New().String(), make(map[string]func(e Event))}
 }
